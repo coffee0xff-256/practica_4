@@ -7,4 +7,5 @@ SOURCES += \
         main.cpp
 
 HEADERS += \
-    enrutador.h
+    enrutador.h \
+    red.h
