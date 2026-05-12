@@ -13,8 +13,11 @@ class Red{
 private:
     map<string,Enrutador> enrutadores;
 
-    map<string,map<string,int> tablasEnrutamiento;
+    map<string,map<string,int>> tablasEnrutamiento;
 public:
+    // arreglo de un problemita
+
+
     void agregarEnrutador(const string &nombre)
     {
         if(enrutadores.find(nombre) == enrutadores.end())
@@ -124,8 +127,8 @@ public:
         }
     }
 
-    //Aqui iria dijktra pero aun no lo pondre, porque quisa me sirve poner otro menos complejo
-    void bfs(const string &origen)
+    //Aqui iria dijktra pero aun no lo pondre, porque quizá me sirve poner otro menos complejo
+    void bfs(const string &origen)// puse algo menos complejo como el algoritmo bfs
     {
         map<string,bool> visitados;
 
@@ -200,7 +203,7 @@ public:
         }
     }
 };
-};
+
 
 
 

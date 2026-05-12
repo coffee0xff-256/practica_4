@@ -8,6 +8,8 @@ class Enrutador{
 
 public:
 
+    Enrutador(){}
+
     Enrutador(const string &nombre)
     {
         this->nombre = nombre;
@@ -40,6 +42,7 @@ public:
 
 
 private:
+
     string nombre;
     map<string,int> enlaces;
 };
