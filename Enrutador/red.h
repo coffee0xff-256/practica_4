@@ -9,20 +9,26 @@
 
 using namespace std;
 
-class Red{
+class Red
+{
 private:
+
     map<string,Enrutador> enrutadores;
 
     map<string,map<string,int>> tablasEnrutamiento;
-public:
-    // arreglo de un problemita
 
+public:
 
     void agregarEnrutador(const string &nombre)
     {
-        if(enrutadores.find(nombre) == enrutadores.end())
+        if(enrutadores.find(nombre) ==
+            enrutadores.end())
         {
-            enrutadores.insert({nombre, Enrutador(nombre)});
+            enrutadores.insert(
+                {
+                    nombre,
+                    Enrutador(nombre)
+                });
         }
     }
 
@@ -40,25 +46,63 @@ public:
                        const string &destino,
                        int costo)
     {
-        if(enrutadores.find(origen) != enrutadores.end() &&
-            enrutadores.find(destino) != enrutadores.end())
-        {
-            enrutadores[origen].agregarEnlace(destino, costo);
+        if(enrutadores.find(origen) !=
+                enrutadores.end() &&
 
-            enrutadores[destino].agregarEnlace(origen, costo);
+                enrutadores.find(destino) !=
+                enrutadores.end())
+        {
+            enrutadores[origen]
+                .agregarEnlace(destino,costo);
+
+            enrutadores[destino]
+                .agregarEnlace(origen,costo);
         }
     }
 
     void removerEnlace(const string &origen,
                        const string &destino)
     {
-        enrutadores[origen].eliminarEnlace(destino);
+        if(enrutadores.find(origen) !=
+            enrutadores.end())
+        {
+            enrutadores[origen]
+                .eliminarEnlace(destino);
+        }
 
-        enrutadores[destino].eliminarEnlace(origen);
+        if(enrutadores.find(destino) !=
+            enrutadores.end())
+        {
+            enrutadores[destino]
+                .eliminarEnlace(origen);
+        }
+    }
+
+    void actualizarCosto(const string &origen,
+                         const string &destino,
+                         int nuevoCosto)
+    {
+        if(enrutadores.find(origen) !=
+            enrutadores.end())
+        {
+            enrutadores[origen]
+                .actualizarCosto(destino,
+                                 nuevoCosto);
+        }
+
+        if(enrutadores.find(destino) !=
+            enrutadores.end())
+        {
+            enrutadores[destino]
+                .actualizarCosto(origen,
+                                 nuevoCosto);
+        }
     }
 
     void cargarDesdeArchivo(const string &nombreArchivo)
     {
+        enrutadores.clear();
+
         ifstream archivo(nombreArchivo);
 
         string linea;
@@ -66,7 +110,9 @@ public:
         while(getline(archivo, linea))
         {
             string origen = "";
+
             string destino = "";
+
             string costoTexto = "";
 
             int i = 0;
@@ -74,6 +120,7 @@ public:
             while(linea[i] != ',')
             {
                 origen += linea[i];
+
                 i++;
             }
 
@@ -82,6 +129,7 @@ public:
             while(linea[i] != ',')
             {
                 destino += linea[i];
+
                 i++;
             }
 
@@ -90,6 +138,7 @@ public:
             while(i < linea.size())
             {
                 costoTexto += linea[i];
+
                 i++;
             }
 
@@ -99,7 +148,44 @@ public:
 
             agregarEnrutador(destino);
 
-            agregarEnlace(origen, destino, costo);
+            agregarEnlace(origen,
+                          destino,
+                          costo);
+        }
+
+        archivo.close();
+    }
+
+    void guardarEnArchivo(const string &nombreArchivo)
+    {
+        ofstream archivo(nombreArchivo);
+
+        for(const auto &router :
+             enrutadores)
+        {
+            string origen =
+                router.first;
+
+            for(const auto &enlace :
+                 router.second.getEnlaces())
+            {
+                string destino =
+                    enlace.first;
+
+                int costo =
+                    enlace.second;
+
+                if(origen < destino)
+                {
+                    archivo
+                        << origen
+                        << ","
+                        << destino
+                        << ","
+                        << costo
+                        << endl;
+                }
+            }
         }
 
         archivo.close();
@@ -107,28 +193,32 @@ public:
 
     void mostrarRed() const
     {
-        for(const auto &router : enrutadores)
+        cout << endl;
+
+        for(const auto &router :
+             enrutadores)
         {
-            cout << "Enrutador: "
-                 << router.first
-                 << endl;
+            cout
+                << "Enrutador: "
+                << router.first
+                << endl;
 
             for(const auto &enlace :
                  router.second.getEnlaces())
             {
-                cout << " -> "
-                     << enlace.first
-                     << " costo: "
-                     << enlace.second
-                     << endl;
+                cout
+                    << " -> "
+                    << enlace.first
+                    << " | costo: "
+                    << enlace.second
+                    << endl;
             }
 
             cout << endl;
         }
     }
 
-    //Aqui iria dijktra pero aun no lo pondre, porque quizá me sirve poner otro menos complejo
-    void bfs(const string &origen)// puse algo menos complejo como el algoritmo bfs
+    void bfs(const string &origen)
     {
         map<string,bool> visitados;
 
@@ -136,11 +226,14 @@ public:
 
         vector<string> cola;
 
-        for(const auto &router : enrutadores)
+        for(const auto &router :
+             enrutadores)
         {
-            visitados[router.first] = false;
+            visitados[router.first] =
+                false;
 
-            distancias[router.first] = -1;
+            distancias[router.first] =
+                -1;
         }
 
         cola.push_back(origen);
@@ -153,18 +246,22 @@ public:
 
         while(inicio < cola.size())
         {
-            string actual = cola[inicio];
+            string actual =
+                cola[inicio];
 
             inicio++;
 
             for(const auto &vecino :
-                 enrutadores[actual].getEnlaces())
+                 enrutadores[actual]
+                     .getEnlaces())
             {
-                string destino = vecino.first;
+                string destino =
+                    vecino.first;
 
                 if(!visitados[destino])
                 {
-                    visitados[destino] = true;
+                    visitados[destino] =
+                        true;
 
                     distancias[destino] =
                         distancias[actual] + 1;
@@ -174,37 +271,47 @@ public:
             }
         }
 
-        tablasEnrutamiento[origen] = distancias;
+        tablasEnrutamiento[origen] =
+            distancias;
     }
 
-
-
-    void mostrarTablaEnrutamiento(const string &origen)
+    void mostrarTablaEnrutamiento(
+        const string &origen)
     {
-        if(tablasEnrutamiento.find(origen) ==
+        if(tablasEnrutamiento.find(origen)
+            ==
             tablasEnrutamiento.end())
         {
             bfs(origen);
         }
 
-        cout << "Tabla de enrutamiento de "
-             << origen
-             << endl;
+        cout << endl;
+
+        cout
+            << "TABLA DE ENRUTAMIENTO"
+            << endl;
+
+        cout
+            << "Origen: "
+            << origen
+            << endl
+            << endl;
 
         for(const auto &destino :
              tablasEnrutamiento[origen])
         {
-            cout << origen
-                 << " -> "
-                 << destino.first
-                 << " costo: "
-                 << destino.second
-                 << endl;
+            cout
+                << origen
+                << " -> "
+                << destino.first
+                << " | saltos: "
+                << destino.second
+                << endl;
         }
+
+        cout << endl;
     }
 };
-
-
 
 
 #endif // RED_H
